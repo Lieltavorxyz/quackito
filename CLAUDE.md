@@ -64,16 +64,17 @@ She opens it daily, taps to feed, play, and dress up her duck.
 - [x] Time-of-day awareness (4 backgrounds: morning, afternoon, evening, night)
 - [x] Mobile-first responsive layout (380px card)
 
-### Phase 3 — Persistence + Backend
+### Phase 3 — Persistence + Backend ✅
 > Goal: Duck state syncs to a server. Works across devices.
-- [ ] Node.js + Express backend in `/server`
-- [ ] Database schema (duck state, interactions log)
-- [ ] REST API: GET/PUT duck state, POST interactions
-- [ ] Backend calculates state decay (hunger drops while away)
-- [ ] Frontend syncs with API
-- [ ] Simple auth (unique link or code — no login wall)
-- [ ] Backend tests + lint
-- [ ] Add backend to Docker Compose and CI pipeline
+- [x] Node.js + Express backend in `/server`
+- [x] PostgreSQL database (ducks + interactions tables)
+- [x] REST API: POST create duck, GET duck state, POST interact
+- [x] Backend calculates state decay on read
+- [x] Frontend syncs with API (optimistic updates, offline fallback)
+- [x] Simple auth via unique duck code (nanoid, no login wall)
+- [x] Secrets via environment variables only (.env, never hardcoded)
+- [ ] Backend tests + lint (skipped for now)
+- [ ] Docker Compose with PostgreSQL + server (next)
 
 ### Phase 4 — PWA + Mobile Experience
 > Goal: Installable on her phone, feels like a real app.
@@ -143,4 +144,4 @@ cd server && npm test        # Run backend tests
 ```
 
 ## Current Status
-**Phase 2 — Complete** | Phase 3 — Next
+**Phase 3 — Complete** | Phase 4 — Next

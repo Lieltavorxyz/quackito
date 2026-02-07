@@ -1,67 +1,52 @@
 import { useState, useEffect, useCallback } from "react";
+import * as api from "../api";
 
 export interface DuckState {
-  hunger: number; // 0-100, 100 = full
-  happiness: number; // 0-100, 100 = very happy
-  energy: number; // 0-100, 100 = fully rested
-  lastUpdated: number; // timestamp
+  hunger: number;
+  happiness: number;
+  energy: number;
+  lastUpdated: number;
 }
 
 export type DuckMood = "happy" | "content" | "hungry" | "sad" | "tired" | "sleeping";
 
 const STORAGE_KEY = "quackito-duck";
+const CODE_KEY = "quackito-code";
 
-// How fast stats decay: points lost per minute
+// Decay rates (used for local fallback only)
 const DECAY_RATES = {
-  hunger: 0.3, // loses ~18 points per hour
-  happiness: 0.2, // loses ~12 points per hour
-  energy: 0.15, // loses ~9 points per hour
-};
-
-// How much each action restores
-const ACTION_VALUES = {
-  feed: { hunger: 25 },
-  play: { happiness: 20, energy: -10 },
-  sleep: { energy: 35 },
+  hunger: 0.3,
+  happiness: 0.2,
+  energy: 0.15,
 };
 
 function getDefaultState(): DuckState {
-  return {
-    hunger: 80,
-    happiness: 80,
-    energy: 80,
-    lastUpdated: Date.now(),
-  };
+  return { hunger: 80, happiness: 80, energy: 80, lastUpdated: Date.now() };
 }
 
-function loadState(): DuckState {
+function loadLocal(): DuckState {
   try {
     const saved = localStorage.getItem(STORAGE_KEY);
-    if (saved) {
-      return JSON.parse(saved);
-    }
+    if (saved) return JSON.parse(saved);
   } catch {
-    // corrupted data, start fresh
+    // corrupted
   }
   return getDefaultState();
 }
 
 function applyDecay(state: DuckState): DuckState {
-  const now = Date.now();
-  const minutesElapsed = (now - state.lastUpdated) / 60000;
-
+  const minutesElapsed = (Date.now() - state.lastUpdated) / 60000;
   if (minutesElapsed < 0.1) return state;
-
   return {
     hunger: Math.max(0, state.hunger - DECAY_RATES.hunger * minutesElapsed),
     happiness: Math.max(0, state.happiness - DECAY_RATES.happiness * minutesElapsed),
     energy: Math.max(0, state.energy - DECAY_RATES.energy * minutesElapsed),
-    lastUpdated: now,
+    lastUpdated: Date.now(),
   };
 }
 
-function clamp(value: number): number {
-  return Math.min(100, Math.max(0, value));
+function clamp(v: number) {
+  return Math.min(100, Math.max(0, v));
 }
 
 function getMood(state: DuckState): DuckMood {
@@ -73,18 +58,49 @@ function getMood(state: DuckState): DuckMood {
   return "content";
 }
 
-export function useDuck() {
-  const [state, setState] = useState<DuckState>(() => {
-    const loaded = loadState();
-    return applyDecay(loaded);
-  });
+const ACTION_VALUES = {
+  feed: { hunger: 25 },
+  play: { happiness: 20, energy: -10 },
+  sleep: { energy: 35 },
+};
 
-  // Save to localStorage whenever state changes
+export function useDuck() {
+  const [state, setState] = useState<DuckState>(() => applyDecay(loadLocal()));
+  const [duckCode, setDuckCode] = useState<string | null>(
+    () => localStorage.getItem(CODE_KEY)
+  );
+  const [online, setOnline] = useState(false);
+
+  // On mount: try to sync with server
+  useEffect(() => {
+    async function init() {
+      try {
+        if (duckCode) {
+          // Fetch existing duck from server (decay is applied server-side)
+          const duck = await api.getDuck(duckCode);
+          setState({ ...duck, lastUpdated: Date.now() });
+        } else {
+          // Create a new duck on the server
+          const duck = await api.createDuck();
+          localStorage.setItem(CODE_KEY, duck.code);
+          setDuckCode(duck.code);
+          setState({ ...duck, lastUpdated: Date.now() });
+        }
+        setOnline(true);
+      } catch {
+        // Server unavailable — use localStorage fallback
+        setOnline(false);
+      }
+    }
+    init();
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Save to localStorage as backup
   useEffect(() => {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
   }, [state]);
 
-  // Decay stats every 30 seconds while the app is open
+  // Local decay every 30 seconds
   useEffect(() => {
     const interval = setInterval(() => {
       setState((prev) => applyDecay(prev));
@@ -92,32 +108,33 @@ export function useDuck() {
     return () => clearInterval(interval);
   }, []);
 
-  const feed = useCallback(() => {
-    setState((prev) => ({
-      ...prev,
-      hunger: clamp(prev.hunger + ACTION_VALUES.feed.hunger),
-      lastUpdated: Date.now(),
-    }));
-  }, []);
+  const doAction = useCallback(
+    async (action: "feed" | "play" | "sleep") => {
+      // Optimistic local update
+      const effects = ACTION_VALUES[action];
+      setState((prev) => ({
+        hunger: clamp(prev.hunger + (effects.hunger || 0)),
+        happiness: clamp(prev.happiness + (effects.happiness || 0)),
+        energy: clamp(prev.energy + (effects.energy || 0)),
+        lastUpdated: Date.now(),
+      }));
 
-  const play = useCallback(() => {
-    setState((prev) => ({
-      ...prev,
-      happiness: clamp(prev.happiness + ACTION_VALUES.play.happiness),
-      energy: clamp(prev.energy + ACTION_VALUES.play.energy),
-      lastUpdated: Date.now(),
-    }));
-  }, []);
+      // Sync to server if available
+      if (duckCode && online) {
+        try {
+          const duck = await api.interact(duckCode, action);
+          setState({ ...duck, lastUpdated: Date.now() });
+        } catch {
+          // Server failed — local update already applied
+        }
+      }
+    },
+    [duckCode, online]
+  );
 
-  const sleep = useCallback(() => {
-    setState((prev) => ({
-      ...prev,
-      energy: clamp(prev.energy + ACTION_VALUES.sleep.energy),
-      lastUpdated: Date.now(),
-    }));
-  }, []);
+  const feed = useCallback(() => doAction("feed"), [doAction]);
+  const play = useCallback(() => doAction("play"), [doAction]);
+  const sleep = useCallback(() => doAction("sleep"), [doAction]);
 
-  const mood = getMood(state);
-
-  return { state, mood, feed, play, sleep };
+  return { state, mood: getMood(state), feed, play, sleep, online, duckCode };
 }
