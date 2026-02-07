@@ -1,91 +1,33 @@
-.duck-container {
-  margin: 1rem 0;
-  min-height: 140px;
+.duck-area {
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
+  padding: 0.5rem 0;
 }
 
-.duck {
-  font-size: 6rem;
+.duck-character {
   cursor: pointer;
   user-select: none;
-  transition: transform 0.3s;
 }
 
-.duck:active {
-  transform: scale(1.2);
+.duck-img {
+  width: 160px;
+  height: 160px;
+  object-fit: contain;
+  filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.1));
 }
 
-/* Happy — big bouncy jumps */
-.duck--happy {
-  animation: bounce 1s ease-in-out infinite;
-}
-
-@keyframes bounce {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-20px); }
-}
-
-/* Content — gentle bob */
-.duck--content {
-  animation: bob 2.5s ease-in-out infinite;
-}
-
-@keyframes bob {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-8px); }
-}
-
-/* Hungry — shaky wobble */
-.duck--hungry {
-  animation: wobble 0.5s ease-in-out infinite;
-}
-
-@keyframes wobble {
-  0%, 100% { transform: rotate(0deg); }
-  25% { transform: rotate(-5deg); }
-  75% { transform: rotate(5deg); }
-}
-
-/* Sad — drooping */
-.duck--sad {
-  animation: droop 3s ease-in-out infinite;
-}
-
-@keyframes droop {
-  0%, 100% { transform: translateY(0) rotate(0deg); }
-  50% { transform: translateY(6px) rotate(-3deg); }
-}
-
-/* Tired — slow sway */
-.duck--tired {
-  animation: sway 4s ease-in-out infinite;
-  opacity: 0.7;
-}
-
-@keyframes sway {
-  0%, 100% { transform: rotate(0deg); }
-  25% { transform: rotate(-8deg); }
-  75% { transform: rotate(8deg); }
-}
-
-/* Sleeping — still with pulse */
-.duck--sleeping {
-  animation: pulse 3s ease-in-out infinite;
-  opacity: 0.5;
-}
-
-@keyframes pulse {
-  0%, 100% { transform: scale(1); }
-  50% { transform: scale(1.05); }
+/* Tired duck is slightly faded */
+.duck-character--tired .duck-img {
+  opacity: 0.75;
+  filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.1)) saturate(0.8);
 }
 
 /* Mood label */
-.duck-mood {
-  color: #888;
-  font-size: 0.9rem;
-  margin-top: 0.5rem;
-  font-style: italic;
+.duck-mood-label {
+  color: rgba(255, 255, 255, 0.85);
+  font-size: 0.85rem;
+  font-weight: 500;
+  margin-top: 0.25rem;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
 }

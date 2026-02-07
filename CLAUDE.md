@@ -9,99 +9,107 @@ on how you interact with it. It reacts to time of day (sleeps at night, active i
 She opens it daily, taps to feed, play, and dress up her duck.
 
 ## Decisions Made
-- **Duck style**: Emoji + CSS animations to start. Upgrade to SVG/Lottie later.
-- **Storage**: localStorage first (no backend needed early on). Add DB in Phase 3 if needed.
-- **Hosting**: Vercel (free) for the app she uses. Minikube locally for K8s/ArgoCD demo.
+- **Hosting**: Vercel (free) for the app. Minikube locally for K8s/ArgoCD demo.
 - **Cost**: $0. Optional custom domain ~$10/year later.
-- **No backend in Phase 1-2**: Duck logic runs entirely in the browser.
+- **Secrets**: Environment variables only. Never hardcoded.
+- **Offline-first**: App works without backend, syncs when available.
+- **Auth**: No login — unique duck code in the URL.
 
 ## Tech Stack
 
-| Layer            | Tool                              | When         |
-|------------------|-----------------------------------|--------------|
-| Frontend         | React + TypeScript (Vite)         | Phase 1      |
-| Storage (early)  | localStorage                      | Phase 2      |
-| PWA              | Service Worker + Web Manifest     | Phase 4      |
-| Backend API      | Node.js + Express                 | Phase 3      |
-| Database         | Supabase or PostgreSQL            | Phase 3      |
-| Containerization | Docker + Docker Compose           | Phase 1      |
-| CI/CD            | GitHub Actions                    | Phase 1      |
-| GitOps           | ArgoCD                            | Phase 6      |
-| Orchestration    | Kubernetes + Helm (minikube)      | Phase 6      |
-| Monitoring       | Prometheus + Grafana (bonus)      | Phase 6      |
-| Hosting          | Vercel (free tier)                | Phase 4      |
-
-## Duck Mechanics
-- **Hunger**: Decreases over time. Feed the duck to restore it.
-- **Happiness**: Decreases over time. Play with the duck to restore it.
-- **Energy**: Decreases with activity. Duck sleeps at night to recharge.
-- **Mood**: Derived from hunger + happiness + energy. Affects duck's expression.
-- **Level/Growth**: Duck earns XP from interactions. Levels up over time.
-- **Outfits**: Unlock cosmetics as the duck levels up (hats, bows, sunglasses).
-- **Time awareness**: Duck sleeps at night, is energetic in morning, lazy in afternoon.
+| Layer            | Tool                              |
+|------------------|-----------------------------------|
+| Frontend         | React + TypeScript (Vite)         |
+| Styling          | CSS + Glassmorphism               |
+| Duck Art         | Gemini-generated illustrations    |
+| Animations       | Framer Motion + CSS               |
+| Backend API      | Node.js + Express                 |
+| Database         | PostgreSQL                        |
+| Containerization | Docker + Docker Compose           |
+| CI/CD            | GitHub Actions                    |
+| GitOps           | ArgoCD                            |
+| Orchestration    | Kubernetes + Helm (minikube)      |
+| Hosting          | Vercel (free tier)                |
 
 ## Phases
 
-### Phase 1 — Project Foundation ✅
-> Goal: Repo setup, React app running locally, CI on PRs.
-- [x] Initialize git repo + CLAUDE.md
-- [x] React + TypeScript frontend (Vite) in `/client`
-- [x] Basic landing page with duck emoji placeholder
-- [x] ESLint + Jest setup (3 tests passing)
-- [x] Dockerfile for frontend (multi-stage: build + nginx)
-- [x] Docker Compose for local dev
-- [x] GitHub Actions CI pipeline (lint + test on every PR, build on main)
-- [x] Push to GitHub
+### Phase 1 — Foundation ✅
+> Everything needed to get a working app with backend, CI/CD, and basic gameplay.
+>
+> **Completed:**
+> - React + TypeScript frontend (Vite) with ESLint + Jest
+> - Express backend with PostgreSQL (ducks + interactions tables)
+> - REST API with server-side decay calculation
+> - Duck state engine (hunger, happiness, energy) with localStorage + API sync
+> - 6 mood states with CSS animations (bounce, bob, wobble, droop, sway, pulse)
+> - Time-of-day awareness (4 background gradients)
+> - Feed / Play / Sleep actions with optimistic updates
+> - Dockerfiles for client (nginx) and server (node)
+> - Docker Compose (client + server + PostgreSQL)
+> - GitHub Actions CI pipeline (lint → test → build → deploy)
+> - Auth via unique duck code (nanoid), secrets via env vars only
 
-### Phase 2 — The Duck Comes Alive ✅
-> Goal: A duck appears on screen, has stats, and reacts to interactions.
-- [x] Duck component (emoji with 6 mood animations: bounce, bob, wobble, droop, sway, pulse)
-- [x] Duck state engine with localStorage (hunger, happiness, energy)
-- [x] State decay over time (hunger/happiness drop while app is closed)
-- [x] Core actions: Feed (+25 hunger), Play (+20 happy, -10 energy), Sleep (+35 energy)
-- [x] Status bars with color coding (green/orange/red)
-- [x] Duck mood/expression changes (happy, content, hungry, sad, tired, sleeping)
-- [x] Time-of-day awareness (4 backgrounds: morning, afternoon, evening, night)
-- [x] Mobile-first responsive layout (380px card)
+### Phase 2 — Design & UI Overhaul (in progress)
+> Goal: Make it look and feel like a 2026 app. Not generic — polished, cute, delightful.
+>
+> **Completed:**
+> - Quicksand font for modern rounded typography
+> - Framer Motion added for spring-physics animations
+> - Custom duck art generated via Gemini — 6 mood images (happy, content, sad, hungry, tired, sleeping)
+> - Custom action button icons generated via Gemini (cookie, paw+ball, sleeping duck)
+> - Duck component rewritten: real PNG images per mood with unique Framer Motion animations
+> - AnimatePresence for smooth transitions between mood states
+> - Full CSS-drawn Background scene: sky gradients (4 times of day), animated clouds, sun/moon, stars at night, hills, grass, shimmering pond
+> - Glassmorphism glass card (backdrop-filter blur, semi-transparent, soft borders)
+> - StatusBars redesigned with Framer Motion spring-animated fills and gradient colors
+> - ActionButtons redesigned with spring hover/tap physics and custom icon images
+> - Mobile-first centered layout
+> - Time-of-day greeting text
+>
+> **Remaining:**
+- [ ] Particle effects and micro-interactions (hearts, sparkles on actions)
+- [ ] Dark mode support
+- [ ] Loading states and transitions between screens
+- [ ] Sound design (subtle, toggleable)
+- [ ] Clean up unused files (DuckSvg.tsx, original sprite sheets)
 
-### Phase 3 — Persistence + Backend ✅
-> Goal: Duck state syncs to a server. Works across devices.
-- [x] Node.js + Express backend in `/server`
-- [x] PostgreSQL database (ducks + interactions tables)
-- [x] REST API: POST create duck, GET duck state, POST interact
-- [x] Backend calculates state decay on read
-- [x] Frontend syncs with API (optimistic updates, offline fallback)
-- [x] Simple auth via unique duck code (nanoid, no login wall)
-- [x] Secrets via environment variables only (.env, never hardcoded)
-- [ ] Backend tests + lint (skipped for now)
-- [ ] Docker Compose with PostgreSQL + server (next)
+### Phase 3 — Duck Behavior & Personality
+> Goal: The duck feels alive — not just numbers going up and down.
+- [ ] Idle animations (duck waddles around, looks at things, preens feathers)
+- [ ] Reaction animations (hearts when fed, sparkles when playing, zzz when sleeping)
+- [ ] Duck personality traits (each duck is slightly different)
+- [ ] Mini-games for "Play" action (not just a button press)
+- [ ] Food choices for "Feed" (bread, seeds, berries — different effects)
+- [ ] Duck aging / evolution (baby → duckling → adult)
+- [ ] XP and leveling system
+- [ ] Outfit / accessory shop (hats, bows, sunglasses — unlocked by level)
+- [ ] Daily surprises / random events ("Quackito found a flower!")
+- [ ] Streak tracking (consecutive days visiting)
 
-### Phase 4 — PWA + Mobile Experience
-> Goal: Installable on her phone, feels like a real app.
-- [ ] Web App Manifest (icon, name, theme color, splash screen)
+### Phase 4 — PWA + Go Live
+> Goal: Installable on her phone, deployed and shareable.
+- [ ] Web App Manifest (icon, splash screen, theme color)
 - [ ] Service Worker (offline caching)
 - [ ] "Add to Home Screen" prompt
-- [ ] Deploy to Vercel (free)
-- [ ] Push notifications — "Your duck is hungry!" (optional)
+- [ ] Deploy frontend to Vercel (free)
+- [ ] Deploy backend (Railway / Render free tier)
+- [ ] Push notifications — "Quackito misses you!" (optional)
+- [ ] Custom domain (optional)
 
-### Phase 5 — Leveling, Outfits, Polish
-> Goal: Progression system that keeps her coming back.
-- [ ] XP from interactions, level-up milestones
-- [ ] Duck evolves at level thresholds (baby → teen → adult)
-- [ ] Outfit shop: hats, bows, sunglasses (unlocked by level)
-- [ ] Animations: eating, playing, sleeping, leveling up
-- [ ] Sound effects (quack on tap, munch on feed)
-- [ ] Easter eggs and personal touches
-
-### Phase 6 — Full DevOps Pipeline
+### Phase 5 — Full DevOps Pipeline
 > Goal: Production-grade infrastructure for DevOps portfolio.
-- [ ] Dockerfiles for frontend (nginx) and backend (node)
-- [ ] GitHub Actions: lint → test → build → push image
+- [ ] GitHub Actions: lint → test → build → push image → deploy
 - [ ] Kubernetes manifests (deployment, service, ingress)
 - [ ] Helm chart for parameterized deploys
 - [ ] ArgoCD setup (push to main = auto deploy to minikube)
-- [ ] Prometheus metrics endpoint on backend
+- [ ] Prometheus metrics endpoint
 - [ ] Grafana dashboard (requests, duck interactions, uptime)
+
+## Design Tools (recommended)
+- **v0.dev** — Generate React + Tailwind UI from text descriptions
+- **Midjourney / DALL-E** — Generate custom duck character illustrations
+- **Rive** — Interactive vector animations (duck movement)
+- **Figma** — Mockup the full UI before coding
 
 ## Project Structure
 ```
@@ -109,39 +117,50 @@ quackito/
 ├── client/                 # React PWA frontend
 │   ├── src/
 │   │   ├── components/     # Duck, StatusBars, ActionButtons
-│   │   ├── hooks/          # useDuck, useTime
-│   │   ├── assets/         # Duck sprites, sounds
+│   │   ├── hooks/          # useDuck, useTimeOfDay
+│   │   ├── assets/         # Duck art, sounds
+│   │   ├── api.ts          # Backend API client
 │   │   └── App.tsx
-│   ├── public/
-│   │   └── manifest.json   # PWA manifest
 │   ├── Dockerfile
 │   └── package.json
-├── server/                 # Express API (Phase 3+)
+├── server/                 # Express API backend
 │   ├── src/
-│   ├── tests/
+│   │   ├── routes/         # API routes
+│   │   └── db/             # Pool, schema, migrations
 │   ├── Dockerfile
 │   └── package.json
-├── k8s/                    # Kubernetes manifests (Phase 6)
-├── helm/                   # Helm chart (Phase 6)
+├── k8s/                    # Kubernetes manifests (Phase 5)
+├── helm/                   # Helm chart (Phase 5)
 ├── .github/workflows/      # CI/CD pipelines
-├── docker-compose.yml      # Local dev environment
+├── docker-compose.yml      # Local dev (client + server + postgres)
+├── .env.example            # Required env vars template
 └── CLAUDE.md               # This file
 ```
 
 ## Commands
 ```bash
 # Client
-cd client && npm run dev     # Start React dev server
-cd client && npm test        # Run frontend tests
-cd client && npm run lint    # Lint frontend
+cd client && npm run dev       # Start React dev server (port 5173)
+cd client && npm test          # Run frontend tests
+cd client && npm run lint      # Lint frontend
+cd client && npm run build     # Production build
 
-# Docker
-docker-compose up --build    # Run everything locally
+# Server
+cd server && npm run dev       # Start backend (port 3001)
+cd server && npm start         # Production start
 
-# Server (Phase 3+)
-cd server && npm run dev     # Start backend dev server
-cd server && npm test        # Run backend tests
+# Docker (full stack)
+docker-compose up --build      # Client + Server + PostgreSQL
 ```
 
 ## Current Status
-**Phase 3 — Complete** | Phase 4 — Next
+**Phase 1 — Complete** | **Phase 2 (Design) — In Progress**
+
+## Next Session — Pick Up Here
+1. **Build & verify** — Run `npm run build` in client/ to confirm all Phase 2 changes compile cleanly (icon imports, Framer Motion, Background component, etc.)
+2. **Run dev server** — `npm run dev` and visually check the full redesign in browser
+3. **Particle effects** — Add floating hearts when feeding, sparkles when playing, zzz particles when sleeping (micro-interactions)
+4. **Clean up** — Remove `DuckSvg.tsx` (replaced by PNG images) and original Gemini sprite sheet files from assets/
+5. **Fix tests** — Update existing tests to match new component structure (props changed, emoji → img)
+6. **Dark mode** — Consider auto dark mode based on time-of-day (night = darker UI)
+7. **Wrap Phase 2** — Mark complete, push, then start Phase 3 (Duck Behavior & Personality)

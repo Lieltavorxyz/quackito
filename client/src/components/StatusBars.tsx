@@ -1,3 +1,4 @@
+import { motion } from "framer-motion";
 import "./StatusBars.css";
 
 interface StatusBarsProps {
@@ -6,27 +7,31 @@ interface StatusBarsProps {
   energy: number;
 }
 
-function getBarColor(value: number): string {
-  if (value > 60) return "#4caf50"; // green
-  if (value > 30) return "#ff9800"; // orange
-  return "#f44336"; // red
+function getBarGradient(value: number): string {
+  if (value > 60) return "linear-gradient(90deg, #56ab2f, #a8e063)";
+  if (value > 30) return "linear-gradient(90deg, #f7971e, #ffd200)";
+  return "linear-gradient(90deg, #e44d26, #f09819)";
 }
 
 function StatusBar({ label, value, icon }: { label: string; value: number; icon: string }) {
   const percent = Math.round(value);
-  const color = getBarColor(value);
 
   return (
-    <div className="status-bar">
-      <span className="status-bar__icon">{icon}</span>
-      <span className="status-bar__label">{label}</span>
-      <div className="status-bar__track">
-        <div
-          className="status-bar__fill"
-          style={{ width: `${percent}%`, backgroundColor: color }}
+    <div className="stat">
+      <div className="stat__header">
+        <span className="stat__icon">{icon}</span>
+        <span className="stat__label">{label}</span>
+        <span className="stat__value">{percent}%</span>
+      </div>
+      <div className="stat__track">
+        <motion.div
+          className="stat__fill"
+          style={{ backgroundImage: getBarGradient(value) }}
+          initial={false}
+          animate={{ width: `${percent}%` }}
+          transition={{ type: "spring", stiffness: 100, damping: 15 }}
         />
       </div>
-      <span className="status-bar__value">{percent}%</span>
     </div>
   );
 }
@@ -35,7 +40,7 @@ export function StatusBars({ hunger, happiness, energy }: StatusBarsProps) {
   return (
     <div className="status-bars">
       <StatusBar label="Hunger" value={hunger} icon="🍞" />
-      <StatusBar label="Happy" value={happiness} icon="💛" />
+      <StatusBar label="Happiness" value={happiness} icon="💛" />
       <StatusBar label="Energy" value={energy} icon="⚡" />
     </div>
   );
