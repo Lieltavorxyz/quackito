@@ -53,16 +53,16 @@ She opens it daily, taps to feed, play, and dress up her duck.
 - [x] GitHub Actions CI pipeline (lint + test on every PR, build on main)
 - [x] Push to GitHub
 
-### Phase 2 — The Duck Comes Alive
+### Phase 2 — The Duck Comes Alive ✅
 > Goal: A duck appears on screen, has stats, and reacts to interactions.
-- [ ] Duck component (emoji 🦆 + CSS animations: idle bounce, wiggle, blink)
-- [ ] Duck state engine with localStorage (hunger, happiness, energy)
-- [ ] State decay over time (hunger/happiness drop while app is closed)
-- [ ] Core actions: Feed, Play, Put to Sleep
-- [ ] Status bars (hunger, happiness, energy)
-- [ ] Duck mood/expression changes based on stats
-- [ ] Time-of-day awareness (background + duck behavior changes)
-- [ ] Mobile-first responsive layout
+- [x] Duck component (emoji with 6 mood animations: bounce, bob, wobble, droop, sway, pulse)
+- [x] Duck state engine with localStorage (hunger, happiness, energy)
+- [x] State decay over time (hunger/happiness drop while app is closed)
+- [x] Core actions: Feed (+25 hunger), Play (+20 happy, -10 energy), Sleep (+35 energy)
+- [x] Status bars with color coding (green/orange/red)
+- [x] Duck mood/expression changes (happy, content, hungry, sad, tired, sleeping)
+- [x] Time-of-day awareness (4 backgrounds: morning, afternoon, evening, night)
+- [x] Mobile-first responsive layout (380px card)
 
 ### Phase 3 — Persistence + Backend
 > Goal: Duck state syncs to a server. Works across devices.
@@ -143,4 +143,4 @@ cd server && npm test        # Run backend tests
 ```
 
 ## Current Status
-**Phase 1 — Complete** | Phase 2 — Next
+**Phase 2 — Complete** | Phase 3 — Next

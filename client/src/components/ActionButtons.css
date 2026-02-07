@@ -1,0 +1,44 @@
+.actions {
+  display: flex;
+  gap: 0.75rem;
+  justify-content: center;
+  margin-top: 1rem;
+}
+
+.action-btn {
+  background: #fff3e6;
+  border: 2px solid #f4845f;
+  border-radius: 12px;
+  padding: 0.7rem 1.2rem;
+  font-size: 1rem;
+  color: #f4845f;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-family: inherit;
+  font-weight: 500;
+}
+
+.action-btn:hover {
+  transform: scale(1.08);
+}
+
+.action-btn:active {
+  transform: scale(0.95);
+}
+
+.action-btn--feed:hover {
+  background: #f4845f;
+  color: white;
+}
+
+.action-btn--play:hover {
+  background: #7c4dff;
+  border-color: #7c4dff;
+  color: white;
+}
+
+.action-btn--sleep:hover {
+  background: #5c6bc0;
+  border-color: #5c6bc0;
+  color: white;
+}

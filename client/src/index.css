@@ -6,15 +6,9 @@
 
 body {
   font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
-  background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
   min-height: 100vh;
-  display: flex;
-  justify-content: center;
-  align-items: center;
 }
 
 #root {
   width: 100%;
-  max-width: 420px;
-  padding: 1rem;
 }
