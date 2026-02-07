@@ -1,0 +1,78 @@
+.app {
+  text-align: center;
+  background: white;
+  border-radius: 24px;
+  padding: 2rem 1.5rem;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+}
+
+/* Duck character */
+.duck-container {
+  margin: 1rem 0;
+}
+
+.duck {
+  font-size: 6rem;
+  animation: bounce 2s ease-in-out infinite;
+  cursor: pointer;
+  user-select: none;
+}
+
+@keyframes bounce {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-12px);
+  }
+}
+
+/* Typography */
+.title {
+  font-size: 2.2rem;
+  color: #f4845f;
+  margin: 0.5rem 0 0.25rem;
+}
+
+.subtitle {
+  color: #888;
+  font-size: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.coming-soon {
+  color: #bbb;
+  font-size: 0.85rem;
+  margin-top: 1rem;
+  font-style: italic;
+}
+
+/* Action buttons */
+.actions {
+  display: flex;
+  gap: 0.75rem;
+  justify-content: center;
+}
+
+.action-btn {
+  background: #fff3e6;
+  border: 2px solid #f4845f;
+  border-radius: 12px;
+  padding: 0.6rem 1rem;
+  font-size: 0.95rem;
+  color: #f4845f;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-family: inherit;
+}
+
+.action-btn:hover:not(:disabled) {
+  background: #f4845f;
+  color: white;
+  transform: scale(1.05);
+}
+
+.action-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
