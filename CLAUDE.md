@@ -11,9 +11,11 @@ She opens it daily, taps to feed, play, and dress up her duck.
 ## Decisions Made
 - **Hosting**: Vercel (free) for the app. Minikube locally for K8s/ArgoCD demo.
 - **Cost**: $0. Optional custom domain ~$10/year later.
-- **Secrets**: Environment variables only. Never hardcoded.
+- **Secrets**: K8s Secrets (created manually), env vars in pods. Never in git.
 - **Offline-first**: App works without backend, syncs when available.
 - **Auth**: No login — unique duck code in the URL.
+- **Docker Registry**: GitHub Container Registry (ghcr.io)
+- **GitOps**: ArgoCD watches `helm/quackito/` in main branch, auto-deploys to minikube.
 
 ## Tech Stack
 
@@ -24,10 +26,10 @@ She opens it daily, taps to feed, play, and dress up her duck.
 | Duck Art         | Gemini-generated illustrations    |
 | Animations       | Framer Motion + CSS               |
 | Backend API      | Node.js + Express                 |
-| Database         | PostgreSQL                        |
+| Database         | PostgreSQL (Bitnami Helm chart)   |
 | Containerization | Docker + Docker Compose           |
-| CI/CD            | GitHub Actions                    |
-| GitOps           | ArgoCD                            |
+| CI/CD            | GitHub Actions → GHCR             |
+| GitOps           | ArgoCD (auto-sync from git)       |
 | Orchestration    | Kubernetes + Helm (minikube)      |
 | Hosting          | Vercel (free tier)                |
 
@@ -49,7 +51,7 @@ She opens it daily, taps to feed, play, and dress up her duck.
 > - GitHub Actions CI pipeline (lint → test → build → deploy)
 > - Auth via unique duck code (nanoid), secrets via env vars only
 
-### Phase 2 — Design & UI Overhaul (in progress)
+### Phase 2 — Design & UI Overhaul ✅
 > Goal: Make it look and feel like a 2026 app. Not generic — polished, cute, delightful.
 >
 > **Completed:**
@@ -65,15 +67,32 @@ She opens it daily, taps to feed, play, and dress up her duck.
 > - ActionButtons redesigned with spring hover/tap physics and custom icon images
 > - Mobile-first centered layout
 > - Time-of-day greeting text
+> - Particle effects on actions (hearts/sparkles/zzz via Framer Motion)
+> - Cleaned up unused files (DuckSvg.tsx, Gemini sprite sheets)
+> - Fixed tests for new component structure
+>
+> **Deferred to later phases:**
+> - Dark mode support
+> - Sound design
+> - Loading states
+
+### Phase 3 — CI/CD + Kubernetes + ArgoCD (in progress)
+> Goal: Full DevOps pipeline — CI pushes images to GHCR, Helm deploys to minikube, ArgoCD auto-syncs.
+>
+> **Completed:**
+> - Helm chart with templates (client deployment/service, server deployment/service, ingress)
+> - Bitnami PostgreSQL as Helm subchart dependency
+> - Server config via ConfigMap + K8s Secret (DB credentials from pre-existing secret)
+> - Ingress routes: /api → server, / → client
+> - GitHub Actions upgraded: lint/test client+server → build & push to GHCR → update Helm image tags
+> - ArgoCD Application manifest (auto-sync from git, self-heal, prune)
+> - .gitignore updated for Helm chart dependencies
 >
 > **Remaining:**
-- [ ] Particle effects and micro-interactions (hearts, sparkles on actions)
-- [ ] Dark mode support
-- [ ] Loading states and transitions between screens
-- [ ] Sound design (subtle, toggleable)
-- [ ] Clean up unused files (DuckSvg.tsx, original sprite sheets)
+- [ ] Test full deploy on minikube (start cluster, install ArgoCD, deploy)
+- [ ] Verify end-to-end GitOps flow (push → CI → GHCR → ArgoCD → pods updated)
 
-### Phase 3 — Duck Behavior & Personality
+### Phase 4 — Duck Behavior & Personality
 > Goal: The duck feels alive — not just numbers going up and down.
 - [ ] Idle animations (duck waddles around, looks at things, preens feathers)
 - [ ] Reaction animations (hearts when fed, sparkles when playing, zzz when sleeping)
@@ -86,7 +105,7 @@ She opens it daily, taps to feed, play, and dress up her duck.
 - [ ] Daily surprises / random events ("Quackito found a flower!")
 - [ ] Streak tracking (consecutive days visiting)
 
-### Phase 4 — PWA + Go Live
+### Phase 5 — PWA + Go Live
 > Goal: Installable on her phone, deployed and shareable.
 - [ ] Web App Manifest (icon, splash screen, theme color)
 - [ ] Service Worker (offline caching)
@@ -96,29 +115,19 @@ She opens it daily, taps to feed, play, and dress up her duck.
 - [ ] Push notifications — "Quackito misses you!" (optional)
 - [ ] Custom domain (optional)
 
-### Phase 5 — Full DevOps Pipeline
-> Goal: Production-grade infrastructure for DevOps portfolio.
-- [ ] GitHub Actions: lint → test → build → push image → deploy
-- [ ] Kubernetes manifests (deployment, service, ingress)
-- [ ] Helm chart for parameterized deploys
-- [ ] ArgoCD setup (push to main = auto deploy to minikube)
-- [ ] Prometheus metrics endpoint
+### Phase 6 — Monitoring & Observability
+> Goal: Production-grade observability for DevOps portfolio.
+- [ ] Prometheus metrics endpoint on server
 - [ ] Grafana dashboard (requests, duck interactions, uptime)
-
-## Design Tools (recommended)
-- **v0.dev** — Generate React + Tailwind UI from text descriptions
-- **Midjourney / DALL-E** — Generate custom duck character illustrations
-- **Rive** — Interactive vector animations (duck movement)
-- **Figma** — Mockup the full UI before coding
 
 ## Project Structure
 ```
 quackito/
 ├── client/                 # React PWA frontend
 │   ├── src/
-│   │   ├── components/     # Duck, StatusBars, ActionButtons
-│   │   ├── hooks/          # useDuck, useTimeOfDay
-│   │   ├── assets/         # Duck art, sounds
+│   │   ├── components/     # Duck, StatusBars, ActionButtons, Particles, Background
+│   │   ├── hooks/          # useDuck, useTimeOfDay, useParticles
+│   │   ├── assets/         # Duck art (6 moods), action icons (3)
 │   │   ├── api.ts          # Backend API client
 │   │   └── App.tsx
 │   ├── Dockerfile
@@ -129,9 +138,14 @@ quackito/
 │   │   └── db/             # Pool, schema, migrations
 │   ├── Dockerfile
 │   └── package.json
-├── k8s/                    # Kubernetes manifests (Phase 5)
-├── helm/                   # Helm chart (Phase 5)
-├── .github/workflows/      # CI/CD pipelines
+├── helm/quackito/          # Helm chart
+│   ├── Chart.yaml          # Chart metadata + bitnami/postgresql dependency
+│   ├── values.yaml         # Image tags (set by CI), replicas, config
+│   └── templates/          # K8s manifests (deployments, services, ingress)
+├── argocd/
+│   └── application.yaml    # ArgoCD Application (watches helm/quackito/ in git)
+├── .github/workflows/      # CI/CD pipeline
+│   └── ci.yml              # Lint → Test → Build → Push GHCR → Update Helm tags
 ├── docker-compose.yml      # Local dev (client + server + postgres)
 ├── .env.example            # Required env vars template
 └── CLAUDE.md               # This file
@@ -151,16 +165,49 @@ cd server && npm start         # Production start
 
 # Docker (full stack)
 docker-compose up --build      # Client + Server + PostgreSQL
+
+# Helm
+helm dependency build helm/quackito/   # Download postgresql subchart
+helm lint helm/quackito/               # Validate chart
+helm template quackito helm/quackito/  # Render templates (dry run)
+```
+
+## Minikube + ArgoCD Setup
+```bash
+# 1. Start cluster
+minikube start
+minikube addons enable ingress
+
+# 2. Install ArgoCD
+kubectl create namespace argocd
+kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml
+
+# 3. Access ArgoCD UI
+kubectl port-forward svc/argocd-server -n argocd 8080:443
+# Get admin password:
+argocd admin initial-password -n argocd
+
+# 4. Create DB secret (before first deploy)
+kubectl create namespace quackito
+kubectl create secret generic quackito-db-secret -n quackito \
+  --from-literal=DB_USER=quackito \
+  --from-literal=DB_PASSWORD=<your-password>
+
+# 5. Deploy via ArgoCD
+kubectl apply -f argocd/application.yaml
+
+# 6. Access the app
+# Add to /etc/hosts: <minikube-ip> quackito.local
+# Then open http://quackito.local
 ```
 
 ## Current Status
-**Phase 1 — Complete** | **Phase 2 (Design) — In Progress**
+**Phase 1 — Complete** | **Phase 2 — Complete** | **Phase 3 (CI/CD + K8s + ArgoCD) — In Progress**
 
 ## Next Session — Pick Up Here
-1. **Build & verify** — Run `npm run build` in client/ to confirm all Phase 2 changes compile cleanly (icon imports, Framer Motion, Background component, etc.)
-2. **Run dev server** — `npm run dev` and visually check the full redesign in browser
-3. **Particle effects** — Add floating hearts when feeding, sparkles when playing, zzz particles when sleeping (micro-interactions)
-4. **Clean up** — Remove `DuckSvg.tsx` (replaced by PNG images) and original Gemini sprite sheet files from assets/
-5. **Fix tests** — Update existing tests to match new component structure (props changed, emoji → img)
-6. **Dark mode** — Consider auto dark mode based on time-of-day (night = darker UI)
-7. **Wrap Phase 2** — Mark complete, push, then start Phase 3 (Duck Behavior & Personality)
+1. **Test minikube deploy** — Start minikube, install ArgoCD, create secret, apply application.yaml
+2. **Verify pods** — All 3 pods (client, server, postgresql) running and healthy
+3. **Test ingress** — Access app via quackito.local, verify API at /api/ducks
+4. **Push to trigger CI** — Commit, push, verify GitHub Actions builds and pushes to GHCR
+5. **Verify GitOps loop** — CI updates values.yaml tag → ArgoCD auto-syncs → new pods roll out
+6. **Mark Phase 3 complete** — Then decide: Phase 4 (duck behavior) or Phase 5 (PWA)

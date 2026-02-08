@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "quackito.fullname" . }}-server
+  labels:
+    {{- include "quackito.server.labels" . | nindent 4 }}
+spec:
+  type: ClusterIP
+  ports:
+    - port: {{ .Values.server.service.port }}
+      targetPort: {{ .Values.server.port }}
+      protocol: TCP
+  selector:
+    {{- include "quackito.server.selectorLabels" . | nindent 4 }}

@@ -1,0 +1,63 @@
+# -- Client (React + nginx)
+client:
+  image:
+    repository: ghcr.io/lieltavorxyz/quackito-client
+    tag: ""  # client-tag
+    pullPolicy: IfNotPresent
+  replicas: 1
+  service:
+    port: 80
+  resources:
+    requests:
+      cpu: 50m
+      memory: 64Mi
+    limits:
+      cpu: 200m
+      memory: 128Mi
+
+# -- Server (Express API)
+server:
+  image:
+    repository: ghcr.io/lieltavorxyz/quackito-server
+    tag: ""  # server-tag
+    pullPolicy: IfNotPresent
+  replicas: 1
+  port: 3001
+  service:
+    port: 3001
+  resources:
+    requests:
+      cpu: 100m
+      memory: 128Mi
+    limits:
+      cpu: 500m
+      memory: 256Mi
+
+# -- Database config (non-sensitive)
+database:
+  name: quackito
+  port: "5432"
+  # Name of a pre-existing K8s Secret containing DB_USER and DB_PASSWORD keys.
+  # Create it manually before deploying:
+  #   kubectl create secret generic quackito-db-secret \
+  #     --from-literal=DB_USER=quackito \
+  #     --from-literal=DB_PASSWORD=<your-password>
+  existingSecret: quackito-db-secret
+
+# -- Bitnami PostgreSQL subchart
+postgresql:
+  enabled: true
+  auth:
+    database: quackito
+    existingSecret: quackito-db-secret
+    secretKeys:
+      userPasswordKey: DB_PASSWORD
+  primary:
+    persistence:
+      size: 1Gi
+
+# -- Ingress
+ingress:
+  enabled: true
+  className: nginx
+  host: quackito.local

@@ -1,0 +1,26 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: quackito
+  namespace: argocd
+spec:
+  project: default
+
+  source:
+    repoURL: https://github.com/Lieltavorxyz/quackito.git
+    targetRevision: main
+    path: helm/quackito
+    helm:
+      valueFiles:
+        - values.yaml
+
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: quackito
+
+  syncPolicy:
+    automated:
+      prune: true       # Delete resources removed from git
+      selfHeal: true    # Revert manual changes in cluster
+    syncOptions:
+      - CreateNamespace=true

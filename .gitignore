@@ -4,3 +4,6 @@ coverage/
 .env
 *.log
 .DS_Store
+
+# Helm downloaded dependencies (rebuilt from Chart.yaml)
+helm/*/charts/
