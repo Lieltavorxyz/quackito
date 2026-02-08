@@ -30,7 +30,7 @@ const MOOD_LABELS: Record<DuckMood, string> = {
   sleeping: "Quackito is sleeping...",
 };
 
-const DUCK_ANIMATIONS: Record<DuckMood, object> = {
+const DUCK_ANIMATIONS: Record<DuckMood, Parameters<typeof motion.div>[0]["animate"]> = {
   happy: {
     y: [0, -10, 0],
     rotate: [0, -3, 0, 3, 0],

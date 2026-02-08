@@ -15,7 +15,7 @@ test("renders the duck", () => {
 test("renders status bars", () => {
   render(<App />);
   expect(screen.getByText("Hunger")).toBeTruthy();
-  expect(screen.getByText("Happy")).toBeTruthy();
+  expect(screen.getByText("Happiness")).toBeTruthy();
   expect(screen.getByText("Energy")).toBeTruthy();
 });
 

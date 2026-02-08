@@ -1,0 +1,14 @@
+.particles-container {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.particle {
+  position: absolute;
+  bottom: 50%;
+  font-size: 1.4rem;
+  user-select: none;
+  text-shadow: 0 1px 6px rgba(0, 0, 0, 0.15);
+}

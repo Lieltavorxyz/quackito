@@ -36,6 +36,11 @@
   margin: 0;
 }
 
+/* Duck + particles wrapper */
+.duck-particles-wrapper {
+  position: relative;
+}
+
 /* Glassmorphism card for stats + actions */
 .glass-card {
   width: 100%;

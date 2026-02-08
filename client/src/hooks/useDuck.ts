@@ -58,7 +58,7 @@ function getMood(state: DuckState): DuckMood {
   return "content";
 }
 
-const ACTION_VALUES = {
+const ACTION_VALUES: Record<string, { hunger?: number; happiness?: number; energy?: number }> = {
   feed: { hunger: 25 },
   play: { happiness: 20, energy: -10 },
   sleep: { energy: 35 },
