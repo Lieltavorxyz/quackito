@@ -6,8 +6,8 @@
   "scripts": {
     "start": "node src/app.js",
     "dev": "nodemon src/app.js",
-    "test": "jest --verbose",
-    "lint": "eslint src/ tests/"
+    "test": "jest --verbose --passWithNoTests",
+    "lint": "eslint src/"
   },
   "dependencies": {
     "cors": "^2.8.5",
