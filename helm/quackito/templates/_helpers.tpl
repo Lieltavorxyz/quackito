@@ -58,7 +58,25 @@ app.kubernetes.io/instance: {{ .Release.Name }}
 {{- end }}
 
 {{/*
-PostgreSQL host — points to the bitnami subchart service
+PostgreSQL labels
+*/}}
+{{- define "quackito.postgresql.labels" -}}
+{{ include "quackito.labels" . }}
+app.kubernetes.io/name: {{ include "quackito.name" . }}-postgresql
+app.kubernetes.io/instance: {{ .Release.Name }}
+app.kubernetes.io/component: database
+{{- end }}
+
+{{/*
+PostgreSQL selector labels
+*/}}
+{{- define "quackito.postgresql.selectorLabels" -}}
+app.kubernetes.io/name: {{ include "quackito.name" . }}-postgresql
+app.kubernetes.io/instance: {{ .Release.Name }}
+{{- end }}
+
+{{/*
+PostgreSQL host — points to our postgresql service
 */}}
 {{- define "quackito.postgresql.host" -}}
 {{ .Release.Name }}-postgresql
