@@ -2,7 +2,7 @@
 client:
   image:
     repository: ghcr.io/lieltavorxyz/quackito-client
-    tag: "dc3a7db6b3e3be1ad8ca5929909464b88a21d215"  # client-tag
+    tag: "e709a376b4471bf65c3f831583ed56794cc516a0"  # client-tag
     pullPolicy: IfNotPresent
   replicas: 1
   service:
@@ -19,7 +19,7 @@ client:
 server:
   image:
     repository: ghcr.io/lieltavorxyz/quackito-server
-    tag: "dc3a7db6b3e3be1ad8ca5929909464b88a21d215"  # server-tag
+    tag: "e709a376b4471bf65c3f831583ed56794cc516a0"  # server-tag
     pullPolicy: IfNotPresent
   replicas: 1
   port: 3001
