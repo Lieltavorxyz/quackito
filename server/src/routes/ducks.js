@@ -18,6 +18,13 @@ const ACTIONS = {
   sleep: { energy: 35 },
 };
 
+// Food types for the feed action (override default feed values)
+const FOOD_TYPES = {
+  bread:   { hunger: 15, happiness: 5 },
+  seeds:   { hunger: 10, happiness: 10 },
+  berries: { hunger: 5,  happiness: 15 },
+};
+
 function clamp(value) {
   return Math.min(100, Math.max(0, value));
 }
@@ -97,10 +104,15 @@ router.get("/:code", async (req, res) => {
 // POST /api/ducks/:code/interact — Feed, play, or sleep
 router.post("/:code/interact", async (req, res) => {
   try {
-    const { action } = req.body;
+    const { action, food_type } = req.body;
 
     if (!action || !ACTIONS[action]) {
       return res.status(400).json({ error: "Invalid action. Use: feed, play, sleep" });
+    }
+
+    // Validate food_type if provided with feed action
+    if (action === "feed" && food_type && !FOOD_TYPES[food_type]) {
+      return res.status(400).json({ error: "Invalid food type. Use: bread, seeds, berries" });
     }
 
     const result = await pool.query(
@@ -115,8 +127,10 @@ router.post("/:code/interact", async (req, res) => {
     const duck = result.rows[0];
     const decayed = applyDecay(duck);
 
-    // Apply action effects on top of decayed state
-    const effects = ACTIONS[action];
+    // For feed action, use food-specific effects if food_type is provided
+    const effects = (action === "feed" && food_type)
+      ? FOOD_TYPES[food_type]
+      : ACTIONS[action];
     const updated = {
       hunger: clamp(decayed.hunger + (effects.hunger || 0)),
       happiness: clamp(decayed.happiness + (effects.happiness || 0)),

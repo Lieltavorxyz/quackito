@@ -7,6 +7,7 @@ import { StatusBars } from "./components/StatusBars";
 import { ActionButtons } from "./components/ActionButtons";
 import { Particles } from "./components/Particles";
 import { useParticles } from "./hooks/useParticles";
+import type { FoodType } from "./api";
 import "./App.css";
 
 function App() {
@@ -14,7 +15,7 @@ function App() {
   const timeOfDay = useTimeOfDay();
   const { particles, emit, remove } = useParticles();
 
-  const handleFeed = useCallback(() => { feed(); emit("feed"); }, [feed, emit]);
+  const handleFeed = useCallback((foodType: FoodType) => { feed(foodType); emit("feed"); }, [feed, emit]);
   const handlePlay = useCallback(() => { play(); emit("play"); }, [play, emit]);
   const handleSleep = useCallback(() => { sleep(); emit("sleep"); }, [sleep, emit]);
 
