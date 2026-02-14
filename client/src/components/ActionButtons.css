@@ -60,3 +60,65 @@
 .action-btn--sleep:hover {
   background: rgba(92, 107, 192, 0.4);
 }
+
+/* Feed wrapper — positions the food picker relative to the feed button */
+.feed-wrapper {
+  position: relative;
+}
+
+/* Food picker popup */
+.food-picker {
+  position: absolute;
+  bottom: calc(100% + 0.5rem);
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  padding: 0.5rem;
+  border-radius: 14px;
+  backdrop-filter: blur(14px);
+  background: rgba(255, 255, 255, 0.18);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.18),
+              inset 0 1px 0 rgba(255, 255, 255, 0.25);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  z-index: 10;
+  min-width: 150px;
+}
+
+/* Individual food option */
+.food-option {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.45rem 0.65rem;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  font-family: "Quicksand", sans-serif;
+  font-weight: 600;
+  background: rgba(255, 165, 0, 0.15);
+  color: #fff;
+  text-align: left;
+  white-space: nowrap;
+}
+
+.food-option:hover {
+  background: rgba(255, 165, 0, 0.35);
+}
+
+.food-option__emoji {
+  font-size: 1.2rem;
+  line-height: 1;
+}
+
+.food-option__label {
+  font-size: 0.8rem;
+  letter-spacing: 0.3px;
+}
+
+.food-option__desc {
+  font-size: 0.6rem;
+  opacity: 0.7;
+  margin-left: auto;
+}

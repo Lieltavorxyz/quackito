@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import * as api from "../api";
+import type { FoodType } from "../api";
 
 export interface DuckState {
   hunger: number;
@@ -64,6 +65,12 @@ const ACTION_VALUES: Record<string, { hunger?: number; happiness?: number; energ
   sleep: { energy: 35 },
 };
 
+const FOOD_VALUES: Record<FoodType, { hunger?: number; happiness?: number; energy?: number }> = {
+  bread:   { hunger: 15, happiness: 5 },
+  seeds:   { hunger: 10, happiness: 10 },
+  berries: { hunger: 5,  happiness: 15 },
+};
+
 export function useDuck() {
   const [state, setState] = useState<DuckState>(() => applyDecay(loadLocal()));
   const [duckCode, setDuckCode] = useState<string | null>(
@@ -109,9 +116,11 @@ export function useDuck() {
   }, []);
 
   const doAction = useCallback(
-    async (action: "feed" | "play" | "sleep") => {
-      // Optimistic local update
-      const effects = ACTION_VALUES[action];
+    async (action: "feed" | "play" | "sleep", foodType?: FoodType) => {
+      // Optimistic local update — use food-specific values for feed if provided
+      const effects = (action === "feed" && foodType)
+        ? FOOD_VALUES[foodType]
+        : ACTION_VALUES[action];
       setState((prev) => ({
         hunger: clamp(prev.hunger + (effects.hunger || 0)),
         happiness: clamp(prev.happiness + (effects.happiness || 0)),
@@ -122,7 +131,7 @@ export function useDuck() {
       // Sync to server if available
       if (duckCode && online) {
         try {
-          const duck = await api.interact(duckCode, action);
+          const duck = await api.interact(duckCode, action, foodType);
           setState({ ...duck, lastUpdated: Date.now() });
         } catch {
           // Server failed — local update already applied
@@ -132,7 +141,7 @@ export function useDuck() {
     [duckCode, online]
   );
 
-  const feed = useCallback(() => doAction("feed"), [doAction]);
+  const feed = useCallback((foodType?: FoodType) => doAction("feed", foodType), [doAction]);
   const play = useCallback(() => doAction("play"), [doAction]);
   const sleep = useCallback(() => doAction("sleep"), [doAction]);
 
